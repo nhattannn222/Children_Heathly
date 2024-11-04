@@ -1,5 +1,5 @@
 export const API = {
-    uri: "https://bdu-be-aiot.onrender.com/api",
+    uri: "http://192.168.1.33:5000/api",
   };
   export const API_KEY_NAME = "auth_token";
   export const AUTH_KEY_NAME = "auth_info";

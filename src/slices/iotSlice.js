@@ -6,6 +6,7 @@ const initState = {
   singleSensor: {},
   paginationSensor: {},
   errors: {},
+  sensorData: {}
 }
 const SensorsSlice = createSlice({
   name: 'Sensor',
@@ -26,6 +27,9 @@ const SensorsSlice = createSlice({
     setPaginationSensor: (state, { payload }) => {
       state.paginationSensor = payload
     },
+    setSensorData: (state, { payload }) => {
+      state.sensorData = payload
+    },
   },
 })
 
@@ -34,7 +38,8 @@ export const {
   setSearchSensor,
   setSingleSensor,
   setErrors,
-  setPaginationSensor
+  setPaginationSensor,
+  setSensorData
 } = SensorsSlice.actions
 
 export default SensorsSlice.reducer

@@ -19,7 +19,7 @@ function Login() {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [showPassword, setShowPassword] = useState(false);
-  const [user, setUser] = useState({ idUser: "", password: "" });
+  const [user, setUser] = useState({ userName: "", password: "" });
   const { isFetching } = useSelector((state) => state.authReducer);
   const authToken = loadTokenFromStorage();
 
@@ -49,15 +49,15 @@ function Login() {
       <View style={styles.formContainer}>
         <Text style={styles.title}>Đăng nhập</Text>
 
-        {/* idUser Input */}
+        {/* userName Input */}
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Username</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter your username"
-            value={user?.idUser}
-            onChangeText={(text) => handleInputChange("idUser", text)}
-            keyboardType="idUser-address"
+            placeholder="Enter your Username"
+            value={user?.userName}
+            onChangeText={(text) => handleInputChange("userName", text)}
+            keyboardType="userName-address"
             autoCapitalize="none"
             autoCorrect={false}
             returnKeyType="next"

@@ -24,35 +24,37 @@ const HomeScreen = () => {
   const allSensor = useSelector((state) => state.IoTReducer.allSensor);
   const user = useSelector((state) => state.authReducer.user);
   const dispatch = useDispatch();
-
+  const latestData = useSelector((state) => state.IoTReducer.sensorData);
+  
   useEffect(() => {
-    dispatch(getSensor(user?.iduser));
+    dispatch(getSensor(user?.deviceName));
 
     const interval = setInterval(() => {
-      dispatch(getSensor(user?.iduser));
+      dispatch(getSensor(user?.deviceName));
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [dispatch, user?.iduser]);
+  }, [dispatch, user?.deviceName]);
 
-  const allSensorData = allSensor?.flatMap(
-    (sensor) => sensor.sensor_data || []
-  );
+  // const allSensorData = allSensor?.flatMap(
+  //   (sensor) => sensor.sensor_data || []
+  // );
 
   // Get the data closest to the current time
-  const latestData = allSensorData?.reduce((closest, current) => {
-    const currentTime = new Date(); // Current time
-    const currentTimestamp = new Date(current.timestamp); // Timestamp of the current data
-    const closestTimestamp = new Date(closest.timestamp); // Timestamp of the closest data
+  // const latestData = allSensorData?.reduce((closest, current) => {
+  //   const currentTime = new Date(); // Current time
+  //   const currentTimestamp = new Date(current.timestamp); // Timestamp of the current data
+  //   const closestTimestamp = new Date(closest.timestamp); // Timestamp of the closest data
 
-    // Compare the time difference between current data and current time with the closest data
-    return Math.abs(currentTime - currentTimestamp) < Math.abs(currentTime - closestTimestamp)
-      ? current
-      : closest;
-  }, allSensorData[0]);
-
+  //   // Compare the time difference between current data and current time with the closest data
+  //   return Math.abs(currentTime - currentTimestamp) < Math.abs(currentTime - closestTimestamp)
+  //     ? current
+  //     : closest;
+  // }, allSensorData[0]);
+  
+  
   // Check conditions for status
-  const ketQuaNhietDo = latestData?.ketQuaNhietDo?.includes("Nguy hiểm");
+  const ketQuaNhietDo = latestData?.ketQuaNhietDo?.includes("Sốt");
   const ketQuaSp02 = latestData?.ketQuaSp02?.includes("Nguy hiểm");
   const ketQuaNhipTim = latestData?.ketQuaNhipTim?.includes("Nguy hiểm");
 
@@ -114,7 +116,7 @@ const HomeScreen = () => {
             <Image source={thermometer} style={styles.icon} />
             <Text style={styles.labelText}>Nhiệt độ</Text>
             <Text style={styles.valueText}>
-              {latestData ? `${latestData?.temp}°C` : "---"}
+              {latestData ? `${latestData?.Temperature}°C` : "---"}
             </Text>
           </View>
 
@@ -124,7 +126,7 @@ const HomeScreen = () => {
             <Text style={styles.labelText}>Nhịp tim</Text>
             <Text style={styles.valueText}>
               {latestData
-                ? `${Math.round(latestData?.heartrate)} lần / phút`
+                ? `${Math.round(latestData?.HeartRate)} lần / phút`
                 : "---"}
             </Text>
           </View>
@@ -134,7 +136,7 @@ const HomeScreen = () => {
             <Image source={spo2} style={styles.icon} />
             <Text style={styles.labelText}>SPO2</Text>
             <Text style={styles.valueText}>
-              {latestData ? `${Math.round(latestData?.sp02)}%` : "---"}
+              {latestData ? `${Math.round(latestData?.SpO2)}%` : "---"}
             </Text>
           </View>
         </View>

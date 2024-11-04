@@ -3,6 +3,7 @@ import { loadTokenFromStorage, removeAuthRefreshFromStorage, removeTokenFromStor
 
 const initState = {
   logged: false,
+  isRegistered: false,
   authToken: "",
   user: {},
   account: {},
@@ -27,6 +28,9 @@ const AuthSlice = createSlice({
       state.account = payload;
     },
     setLogged: (state, { payload }) => {
+      state.logged = payload;
+    },
+    setIsRegisted:(state, { payload }) => {
       state.logged = payload;
     },
     setUser: (state, { payload }) => {
@@ -58,6 +62,7 @@ const AuthSlice = createSlice({
 
 export const {
   setLogged,
+  setIsRegisted,
   loadUser,
   logout,
   setRefresh,

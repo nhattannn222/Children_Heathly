@@ -21,35 +21,54 @@ function Register() {
   const navigation = useNavigation();
   const [showPassword, setShowPassword] = useState(false);
   const [user, setUser] = useState({
-    fullName: "",
-    childName: "",
-    phone: "",
-    email: "",
-    height: "",
-    weight: "",
     deviceName: "",
+    userName: "", // Added username field
     password: "",
-    birthDate: "",
-    username: "", // Thêm trường username
+    parentName: "",
+    childName: "",
+    phoneNumber: "",
+    email: "",
+    childHeight: "",
+    childWeight: "",
+    childBirthday: "",
   });
+
   const { isFetching } = useSelector((state) => state.authReducer);
-  
+
   const inputRefs = {
-    fullName: useRef(null),
-    childName: useRef(null),
-    phone: useRef(null),
-    email: useRef(null),
-    height: useRef(null),
-    weight: useRef(null),
     deviceName: useRef(null),
+    userName: useRef(null), // Added username field reference
     password: useRef(null),
-    birthDate: useRef(null),
-    username: useRef(null), // Thêm ref cho username
+    parentName: useRef(null),
+    childName: useRef(null),
+    phoneNumber: useRef(null),
+    email: useRef(null),
+    childHeight: useRef(null),
+    childWeight: useRef(null),
+    childBirthday: useRef(null),
   };
 
-  const handleRegister = () => {
-    dispatch(register(user)); // Call your register thunk with user data
-  };
+  const handleRegister = async () => {
+    console.log("Registering user:", user);
+    try {
+        const resultAction = await dispatch(register(user,navigation));
+        
+        if (register.fulfilled.match(resultAction)) {
+            console.log("Registration successful:", resultAction.payload);
+            navigation.navigate("Đăng nhập");
+        } else {
+            // Display error feedback to the user
+            const errorMessage = resultAction.payload?.message || "Registration failed.";
+            console.error("Registration error:", errorMessage);
+            dispatch(setErrorsRegister({ message: errorMessage })); // Store errors in state if needed
+        }
+    } catch (error) {
+        console.error("Error dispatching register:", error);
+        const errorMessage = error.response?.data?.message || "An error occurred. Please try again.";
+        dispatch(setErrorsRegister({ message: errorMessage }));
+    }
+};
+
 
   const handleInputChange = (name, value) => {
     setUser((prevUser) => ({
@@ -71,12 +90,12 @@ function Register() {
   };
 
   useEffect(() => {
-    inputRefs.fullName.current?.focus();
+    inputRefs.parentName.current?.focus();
   }, []);
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container} 
+    <KeyboardAvoidingView
+      style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -87,13 +106,13 @@ function Register() {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Tên đăng nhập</Text>
             <TextInput
-              ref={inputRefs.username}
+              ref={inputRefs.userName}
               style={styles.input}
               placeholder="Nhập tên đăng nhập"
-              value={user.username}
-              onChangeText={(text) => handleInputChange("username", text)}
+              value={user.userName}
+              onChangeText={(text) => handleInputChange("userName", text)}
               returnKeyType="next"
-              onKeyPress={(event) => handleKeyDown(event, inputRefs.fullName)}
+              onKeyPress={(event) => handleKeyDown(event, inputRefs.parentName)}
             />
           </View>
 
@@ -101,11 +120,11 @@ function Register() {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Họ và tên phụ huynh</Text>
             <TextInput
-              ref={inputRefs.fullName}
+              ref={inputRefs.parentName}
               style={styles.input}
               placeholder="Nhập họ và tên"
-              value={user.fullName}
-              onChangeText={(text) => handleInputChange("fullName", text)}
+              value={user.parentName} // Use user.parentName to bind the state
+              onChangeText={(text) => handleInputChange("parentName", text)} // Correct property here
               returnKeyType="next"
               onKeyPress={(event) => handleKeyDown(event, inputRefs.childName)}
             />
@@ -121,7 +140,9 @@ function Register() {
               value={user.childName}
               onChangeText={(text) => handleInputChange("childName", text)}
               returnKeyType="next"
-              onKeyPress={(event) => handleKeyDown(event, inputRefs.phone)}
+              onKeyPress={(event) =>
+                handleKeyDown(event, inputRefs.phoneNumber)
+              }
             />
           </View>
 
@@ -129,11 +150,11 @@ function Register() {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Số điện thoại</Text>
             <TextInput
-              ref={inputRefs.phone}
+              ref={inputRefs.phoneNumber}
               style={styles.input}
               placeholder="Nhập số điện thoại"
-              value={user.phone}
-              onChangeText={(text) => handleInputChange("phone", text)}
+              value={user.phoneNumber}
+              onChangeText={(text) => handleInputChange("phoneNumber", text)}
               keyboardType="phone-pad"
               returnKeyType="next"
               onKeyPress={(event) => handleKeyDown(event, inputRefs.email)}
@@ -152,7 +173,9 @@ function Register() {
               keyboardType="email-address"
               autoCapitalize="none"
               returnKeyType="next"
-              onKeyPress={(event) => handleKeyDown(event, inputRefs.height)}
+              onKeyPress={(event) =>
+                handleKeyDown(event, inputRefs.childHeight)
+              }
             />
           </View>
 
@@ -160,14 +183,16 @@ function Register() {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Chiều cao (cm)</Text>
             <TextInput
-              ref={inputRefs.height}
+              ref={inputRefs.childHeight}
               style={styles.input}
               placeholder="Nhập chiều cao"
-              value={user.height}
-              onChangeText={(text) => handleInputChange("height", text)}
+              value={user.childHeight}
+              onChangeText={(text) => handleInputChange("childHeight", text)}
               keyboardType="numeric"
               returnKeyType="next"
-              onKeyPress={(event) => handleKeyDown(event, inputRefs.weight)}
+              onKeyPress={(event) =>
+                handleKeyDown(event, inputRefs.childWeight)
+              }
             />
           </View>
 
@@ -175,11 +200,11 @@ function Register() {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Cân nặng (kg)</Text>
             <TextInput
-              ref={inputRefs.weight}
+              ref={inputRefs.childWeight}
               style={styles.input}
               placeholder="Nhập cân nặng"
-              value={user.weight}
-              onChangeText={(text) => handleInputChange("weight", text)}
+              value={user.childWeight}
+              onChangeText={(text) => handleInputChange("childWeight", text)}
               keyboardType="numeric"
               returnKeyType="next"
               onKeyPress={(event) => handleKeyDown(event, inputRefs.deviceName)}
@@ -196,7 +221,9 @@ function Register() {
               value={user.deviceName}
               onChangeText={(text) => handleInputChange("deviceName", text)}
               returnKeyType="next"
-              onKeyPress={(event) => handleKeyDown(event, inputRefs.birthDate)}
+              onKeyPress={(event) =>
+                handleKeyDown(event, inputRefs.childBirthday)
+              }
             />
           </View>
 
@@ -204,20 +231,20 @@ function Register() {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Ngày sinh của bé</Text>
             <TextInput
-              ref={inputRefs.birthDate}
+              ref={inputRefs.childBirthday}
               style={styles.input}
               placeholder="Nhập ngày sinh (YYYY-MM-DD)"
-              value={user.birthDate}
-              onChangeText={(text) => handleInputChange("birthDate", text)}
+              value={user.childBirthday}
+              onChangeText={(text) => handleInputChange("childBirthday", text)}
               returnKeyType="done"
               onKeyPress={(event) => handleKeyDown(event)}
             />
           </View>
 
           {/* Display Age */}
-          {user.birthDate && (
+          {user.childBirthday && (
             <Text style={styles.ageText}>
-              Độ tuổi của bé: {calculateAge(user.birthDate)} tuổi
+              Độ tuổi của bé: {calculateAge(user.childBirthday)} tuổi
             </Text>
           )}
 
@@ -249,7 +276,10 @@ function Register() {
           </View>
 
           {/* Register Button */}
-          <TouchableOpacity onPress={handleRegister} style={styles.registerButton}>
+          <TouchableOpacity
+            onPress={handleRegister}
+            style={styles.registerButton}
+          >
             <Text style={styles.registerButtonText}>Đăng ký</Text>
           </TouchableOpacity>
 
@@ -268,27 +298,25 @@ function Register() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#F5F5F5",
     justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f3f4f6",
   },
   scrollContainer: {
-    flexGrow: 1,
-    width: Dimensions.get('window').width * 0.95,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
   },
   formContainer: {
-    width: "100%",
+    backgroundColor: "#FFF",
+    borderRadius: 8,
     padding: 20,
-    backgroundColor: "#fff",
-    borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
     },
     shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
+    shadowRadius: 4,
+    elevation: 2,
   },
   title: {
     fontSize: 24,
@@ -296,19 +324,19 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
-  inputContainer: {
-    marginBottom: 15,
-  },
   label: {
     fontSize: 16,
     marginBottom: 5,
   },
+  inputContainer: {
+    marginBottom: 15,
+  },
   input: {
-    borderWidth: 1,
+    height: 40,
     borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
-    fontSize: 16,
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 10,
   },
   passwordContainer: {
     flexDirection: "row",
@@ -316,38 +344,38 @@ const styles = StyleSheet.create({
   },
   passwordInput: {
     flex: 1,
-    borderWidth: 1,
+    height: 40,
     borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
-    fontSize: 16,
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 10,
   },
   iconContainer: {
     paddingHorizontal: 10,
   },
   registerButton: {
     backgroundColor: "#4CAF50",
-    paddingVertical: 15,
-    borderRadius: 5,
+    padding: 10,
+    borderRadius: 4,
     alignItems: "center",
-    marginTop: 20,
   },
   registerButtonText: {
-    color: "#fff",
+    color: "#FFF",
     fontSize: 18,
     fontWeight: "bold",
   },
   linkContainer: {
-    marginTop: 20,
+    marginTop: 10,
     alignItems: "center",
   },
   linkText: {
     color: "#007BFF",
-    fontSize: 16,
   },
   ageText: {
-    fontSize: 16,
     marginTop: 10,
+    fontSize: 16,
+    color: "#333",
+    fontWeight: "bold",
   },
 });
 
