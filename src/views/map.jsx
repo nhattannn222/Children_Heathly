@@ -8,6 +8,8 @@ import parent from '../../assets/parent.png';
 import Layout from '../layout/layout';
 import { useDispatch, useSelector } from 'react-redux';
 import { getSensor } from '../thunks/sencorThunk';
+import axios from 'axios';
+import { API } from "../constants/api"
 
 const MapScreen = () => {
   const dispatch = useDispatch();
@@ -15,34 +17,26 @@ const MapScreen = () => {
   const [errorMsg, setErrorMsg] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null); // State to store clicked marker coordinates
   const [address, setAddress] = useState(null); // State to store address information
-
-  
-  const allSensor = useSelector((state) => state.IoTReducer.allSensor);
+  const [latestData,setLatestData ]=useState({});
   const user = useSelector((state) => state.authReducer.user);
 
+
+  // Fetch notifications when the component is mounted
   useEffect(() => {
-    dispatch(getSensor(user?.iduser));
-
-    const interval = setInterval(() => {
-      dispatch(getSensor(user?.iduser));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [dispatch, user?.iduser]);
-
-  const allSensorData = allSensor?.flatMap(
-    (sensor) => sensor.sensor_data || []
-  );
-
-  const latestData = allSensorData?.reduce((latest, current) => {
-    return new Date(current.timestamp) > new Date(latest.timestamp)
-      ? current
-      : latest;
-  }, allSensorData[0]);
-
+    fetchLocation();
+  }, []);
+  const fetchLocation = async () => {
+    try {
+      const response = await axios.get(`${API.uri}/devices/location/${user?.deviceName}`); // Replace with your actual API endpoint
+      setLatestData(response.data); // Assuming the API response is an array of notifications
+    } catch (error) {
+      console.error('Error fetching location:', error);
+    } finally {
+    }
+  };
   const childLocation = {
-    latitude: latestData?.lat,
-    longitude: latestData?.long,
+    latitude: latestData?.Latitude,
+    longitude: latestData?.Longtitude,
   };
 
   // Fetch current location of the parent
