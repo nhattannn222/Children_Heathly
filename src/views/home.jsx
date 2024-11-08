@@ -35,6 +35,7 @@ const HomeScreen = () => {
 
     return () => clearInterval(interval);
   }, [dispatch, user?.deviceName]);
+  
 
   // const allSensorData = allSensor?.flatMap(
   //   (sensor) => sensor.sensor_data || []
@@ -55,11 +56,11 @@ const HomeScreen = () => {
   
   // Check conditions for status
   const ketQuaNhietDo = latestData?.ketQuaNhietDo?.includes("Sốt");
-  const ketQuaSp02 = latestData?.ketQuaSp02?.includes("Nguy hiểm");
+  const ketQuaSpO2 = latestData?.ketQuaSpO2?.includes("Nguy hiểm");
   const ketQuaNhipTim = latestData?.ketQuaNhipTim?.includes("Nguy hiểm");
 
   // Check if any of the results indicate danger
-  const isDanger = [ketQuaNhietDo, ketQuaSp02, ketQuaNhipTim].some(
+  const isDanger = [ketQuaNhietDo, ketQuaSpO2, ketQuaNhipTim].some(
     (result) => result === true
   );
 
@@ -85,31 +86,24 @@ const HomeScreen = () => {
 
         {/* Info Cards */}
         <View style={styles.infoContainer}>
-          {/* Status */}
-          <View style={styles.infoCard}>
-            <Image source={isDanger ? sad : happy} style={styles.icon} />
-            <Text style={styles.labelText}>Trạng Thái</Text>
-            {ketQuaNhietDo && (
-              <Text style={[styles.valueText, { color: "red" }]}>
-                {latestData?.ketQuaNhietDo}
-              </Text>
-            )}
-            {ketQuaSp02 && (
-              <Text style={[styles.valueText, { color: "red" }]}>
-                {latestData?.ketQuaSp02}
-              </Text>
-            )}
-            {ketQuaNhipTim && (
-              <Text style={[styles.valueText, { color: "red" }]}>
-                {latestData?.ketQuaNhipTim}
-              </Text>
-            )}
-            {!ketQuaNhietDo && !ketQuaNhipTim && !ketQuaSp02 && (
-              <Text style={[styles.valueText, { color: "green" }]}>
-                Bình thường
-              </Text>
-            )}
+         {/* Age */}
+         <View style={[styles.infoCard]}>
+            <Text style={styles.valueText}>
+              Độ tuổi: {latestData ? `${latestData?.age} tuổi` : "---"}
+            </Text>
+  
+            <Text style={styles.valueText}>
+            Giới tính: {latestData ? `${latestData?.gender=="male"?"Nam":"Nữ"} ` : "---"}
+            </Text>
+            <Text style={styles.valueText}>
+            Chiều cao: {latestData ? `${latestData?.height} m ` : "---"}
+            </Text>
+            <Text style={styles.valueText}>
+           Cân nặng: {latestData ? `${latestData?.weight} kg` : "---"}
+            </Text>
           </View>
+
+          
 
           {/* Temperature */}
           <View style={[styles.infoCard, { backgroundColor: ketQuaNhietDo ? "#f74d58" : 'white' }]}>
@@ -132,7 +126,7 @@ const HomeScreen = () => {
           </View>
 
           {/* SPO2 */}
-          <View style={[styles.infoCard, { backgroundColor: ketQuaSp02 ? "#f74d58" : 'white' }]}>
+          <View style={[styles.infoCard, { backgroundColor: ketQuaSpO2 ? "#f74d58" : 'white' }]}>
             <Image source={spo2} style={styles.icon} />
             <Text style={styles.labelText}>SPO2</Text>
             <Text style={styles.valueText}>
@@ -156,7 +150,7 @@ const HomeScreen = () => {
             }
           ]}
         >
-          <Text style={styles.labelText}>Tình trạng của bé</Text>
+          <Text style={styles.labelText}>Dự đoán tình trạng của bé</Text>
           <Text style={styles.valueText}>
             {latestData 
               ? latestData.prediction === "danger" 
@@ -165,6 +159,18 @@ const HomeScreen = () => {
                 ? "Cảnh báo" 
                 : "Bình thường" 
               : "---"}
+          </Text>
+
+          <Text style={styles.valueText}>
+            {
+              ketQuaNhietDo && latestData.ketQuaNhietDo
+            }
+            {
+              ketQuaSpO2 && latestData.ketQuaSpO2
+            }
+            {
+              ketQuaNhipTim && latestData.ketQuaNhipTim
+            }
           </Text>
         </View>
         </View>

@@ -5,6 +5,7 @@ import user from '../../assets/user.png'
 import bell from '../../assets/bell.png'
 import address from '../../assets/address.png'
 import chatbot from '../../assets/chatbot.png'
+import dashboard from '../../assets/dashboard.webp'
 import { useNavigation } from '@react-navigation/native';
 
 const Footer = () => {
@@ -18,7 +19,7 @@ const Footer = () => {
         />
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.iconContainer}  onPress={() => navigation.navigate("Vị trí của bé")}>
+      <TouchableOpacity style={styles.iconContainer}  onPress={() => navigation.navigate("location")}>
         <Image
           source={address} // Path to your location icon
           style={styles.icon}
@@ -28,6 +29,14 @@ const Footer = () => {
       <TouchableOpacity style={styles.iconContainer}  onPress={() => navigation.navigate("Chatbot")}>
         <Image
           source={chatbot} // Path to your location icon
+          style={styles.icon}
+        />
+      </TouchableOpacity>
+
+      
+      <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate("Dashboard")}>
+        <Image
+          source={dashboard} // Path to your user/profile icon
           style={styles.icon}
         />
       </TouchableOpacity>
@@ -45,6 +54,7 @@ const Footer = () => {
           style={styles.icon}
         />
       </TouchableOpacity>
+
     </View>
   );
 };

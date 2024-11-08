@@ -23,11 +23,12 @@ const MapScreen = () => {
 
   // Fetch notifications when the component is mounted
   useEffect(() => {
-    fetchLocation();
+    // fetchLocation();
   }, []);
   const fetchLocation = async () => {
     try {
       const response = await axios.get(`${API.uri}/devices/location/${user?.deviceName}`); // Replace with your actual API endpoint
+      
       setLatestData(response.data); // Assuming the API response is an array of notifications
     } catch (error) {
       console.error('Error fetching location:', error);
@@ -35,9 +36,11 @@ const MapScreen = () => {
     }
   };
   const childLocation = {
-    latitude: latestData?.Latitude,
-    longitude: latestData?.Longtitude,
+    latitude: latestData?.Latitude??11.10774965753401,
+    longitude: latestData?.Longitude??106.61418139708277,
   };
+
+  console.log("childLocation", childLocation)
 
   // Fetch current location of the parent
   useEffect(() => {
@@ -90,8 +93,10 @@ const MapScreen = () => {
 
   return (
     <Layout>
-      <View style={styles.container}>
+      <View 
+      key={childLocation.latitude} style={styles.container}>
         <MapView
+        key={childLocation.latitude}
           style={styles.map}
           initialRegion={{
             latitude: childLocation.latitude,

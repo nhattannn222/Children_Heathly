@@ -10,6 +10,7 @@ import MapScreen from '../views/map'
 import NotificationScreen from '../views/notification'
 import Chatbot from '../views/chatbot'
 import Register from '../views/register'
+import DashboardChart from '../views/DashboardChart'
 
 const Stack = createNativeStackNavigator()
 
@@ -42,8 +43,8 @@ export const LoggedRoute = () => {
           headerTitle: 'Trang cá nhân', 
           headerLeft: () => false, 
         }}/>
-      <Stack.Screen name="Vị trí của bé" component={MapScreen} options={{
-          headerTitle: 'Vị trí của bé', 
+      <Stack.Screen name="location" component={MapScreen} options={{
+          headerTitle: 'location', 
           headerLeft: () => false, 
         }} />
       <Stack.Screen
@@ -59,6 +60,14 @@ export const LoggedRoute = () => {
         component={Chatbot}
         options={{
           headerTitle: 'Chatbot', 
+          // headerLeft: () => false, 
+        }}
+      />
+      <Stack.Screen
+        name="Dashboard"
+        component={DashboardChart}
+        options={{
+          headerTitle: 'Chart', 
           // headerLeft: () => false, 
         }}
       />
