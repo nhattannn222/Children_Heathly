@@ -11,6 +11,7 @@ import {
   Platform,
   Dimensions,
 } from "react-native";
+import {Picker} from "@react-native-picker/picker";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Feather"; // Import icons
 import { register } from "../thunks/authThunk"; // Ensure you have a register thunk
@@ -22,7 +23,7 @@ function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [user, setUser] = useState({
     deviceName: "",
-    userName: "", // Added username field
+    userName: "",
     password: "",
     parentName: "",
     childName: "",
@@ -31,13 +32,14 @@ function Register() {
     childHeight: "",
     childWeight: "",
     childBirthday: "",
+    gender: "Male", // Add gender field
   });
 
   const { isFetching } = useSelector((state) => state.authReducer);
 
   const inputRefs = {
     deviceName: useRef(null),
-    userName: useRef(null), // Added username field reference
+    userName: useRef(null),
     password: useRef(null),
     parentName: useRef(null),
     childName: useRef(null),
@@ -239,6 +241,19 @@ function Register() {
               returnKeyType="done"
               onKeyPress={(event) => handleKeyDown(event)}
             />
+          </View>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Giới tính</Text>
+            <Picker
+              selectedValue={user.gender}
+              style={styles.picker}
+              onValueChange={(itemValue) => handleInputChange("gender", itemValue)}
+            >
+              <Picker.Item label="Chọn giới tính" value="" />
+              <Picker.Item label="Nam" value="male" />
+              <Picker.Item label="Nữ" value="female" />
+              <Picker.Item label="Khác" value="other" />
+            </Picker>
           </View>
 
           {/* Display Age */}

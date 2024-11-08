@@ -1,72 +1,16 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import Layout from '../layout/layout';
-
-const initialNotifications = [
-    {
-        id: '1',
-        type: 'Nguy hiểm',
-        message: 'Bé có trạng thái nguy hiểm vì trạng thái xấu và nhiệt độ bên ngoài quá cao',
-        time: '13:11 20/09/2024',
-        color: 'red',
-        read: false, // Unread notification
-      },
-      {
-        id: '2',
-        type: 'Nguy hiểm',
-        message: 'Nồng độ oxi trong máu của bé quá cao có thể gặp nguy hiểm',
-        time: '13:11 18/09/2024',
-        color: 'red',
-        read: true, // Read notification
-      },
-      {
-        id: '3',
-        type: 'Nguy hiểm',
-        message: 'Nhiệt độ bên ngoài của bé thay đổi đột xuất',
-        time: '13:11 17/09/2024',
-        color: 'red',
-        read: false, // Unread notification
-      },
-      {
-        id: '4',
-        type: 'Nguy hiểm',
-        message: 'Nhịp tim của bé có dấu hiệu thay đổi bất thường',
-        time: '13:11 01/09/2024',
-        color: 'red',
-        read: true, // Read notification
-      },
-      {
-        id: '5',
-        type: 'Cảnh báo',
-        message: 'Vị trí của bé đã thay đổi và cách bạn 10km',
-        time: '13:11 20/08/2024',
-        color: 'yellow',
-        read: false, // Unread notification
-      },
-      {
-        id: '6',
-        type: 'Cảnh báo',
-        message: 'Vị trí của bé đã thay đổi và cách bạn 10km',
-        time: '13:11 20/08/2024',
-        color: 'yellow',
-        read: false, // Unread notification
-      },
-      {
-        id: '7',
-        type: 'Cảnh báo',
-        message: 'Vị trí của bé đã thay đổi và cách bạn 10km',
-        time: '13:11 20/08/2024',
-        color: 'yellow',
-        read: false, // Unread notification
-      },
-];
+import axios from 'axios'; // To make HTTP requests
+import { API } from "../constants/api"
+import { useDispatch, useSelector } from "react-redux";
 
 const NotificationItem = ({ item, onPress }) => (
   <TouchableOpacity onPress={onPress}>
     <View
-      style={[
-        styles.notificationContainer,
-        { borderLeftColor: item.color, backgroundColor: item.read ? '#ffffff' : '#e0f7fa' },
+      style={[ 
+        styles.notificationContainer, 
+        { borderLeftColor: item.color, backgroundColor: item.read ? '#ffffff' : '#e0f7fa' }
       ]}
     >
       <Text style={styles.type}>{item.type}</Text>
@@ -77,8 +21,27 @@ const NotificationItem = ({ item, onPress }) => (
 );
 
 const NotificationScreen = () => {
-  const [notifications, setNotifications] = useState(initialNotifications);
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true); // For loading indicator
+  const user = useSelector((state) => state.authReducer.user);
+  // Function to fetch notifications from the API
+  const fetchNotifications = async () => {
+    try {
+      const response = await axios.get(`${API.uri}/devices/notify/${user?.deviceName}`); // Replace with your actual API endpoint
+      setNotifications(response.data); // Assuming the API response is an array of notifications
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    } finally {
+      setLoading(false); // Stop loading when data is fetched
+    }
+  };
 
+  // Fetch notifications when the component is mounted
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  // Handle marking a notification as read
   const handlePress = (id) => {
     setNotifications((prevNotifications) =>
       prevNotifications.map((notification) =>
@@ -87,18 +50,28 @@ const NotificationScreen = () => {
     );
   };
 
+  // Display loading indicator while fetching data
+  if (loading) {
+    return (
+      <Layout>
+        <View style={styles.container}>
+          <ActivityIndicator size="large" color="#00796b" />
+        </View>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <View style={styles.container}>
-        
         <FlatList
           data={notifications}
           renderItem={({ item }) => (
             <NotificationItem item={item} onPress={() => handlePress(item.id)} />
           )}
           keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false} // Tắt chỉ báo cuộn dọc
-          contentContainerStyle={styles.listContent} // Thêm style cho nội dung danh sách
+          showsVerticalScrollIndicator={false} // Hide vertical scroll indicator
+          contentContainerStyle={styles.listContent} // Add style for list content
         />
       </View>
     </Layout>
@@ -134,7 +107,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   listContent: {
-    paddingBottom: 20, // Thêm khoảng cách dưới cùng cho danh sách
+    paddingBottom: 20, // Add padding at the bottom of the list
   },
 });
 

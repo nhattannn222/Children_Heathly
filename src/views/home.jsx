@@ -139,6 +139,34 @@ const HomeScreen = () => {
               {latestData ? `${Math.round(latestData?.SpO2)}%` : "---"}
             </Text>
           </View>
+
+          <View style={[
+            styles.infoCard, 
+            { 
+              backgroundColor: latestData?.prediction === "danger" 
+                ? "#f74d58" 
+                : latestData?.prediction === "warning" 
+                ? "#FFC107" 
+                : "white",
+              height: 100,
+              width: '100%',
+              borderRadius: 15,
+              justifyContent: 'center',
+              alignItems: 'center'
+            }
+          ]}
+        >
+          <Text style={styles.labelText}>Tình trạng của bé</Text>
+          <Text style={styles.valueText}>
+            {latestData 
+              ? latestData.prediction === "danger" 
+                ? "Nguy hiểm" 
+                : latestData.prediction === "warning" 
+                ? "Cảnh báo" 
+                : "Bình thường" 
+              : "---"}
+          </Text>
+        </View>
         </View>
       </ScrollView>
     </Layout>
