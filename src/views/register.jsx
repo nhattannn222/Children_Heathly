@@ -11,7 +11,7 @@ import {
   Platform,
   Dimensions,
 } from "react-native";
-import {Picker} from "@react-native-picker/picker";
+import { Picker } from "@react-native-picker/picker";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Feather"; // Import icons
 import { register } from "../thunks/authThunk"; // Ensure you have a register thunk
@@ -53,24 +53,25 @@ function Register() {
   const handleRegister = async () => {
     console.log("Registering user:", user);
     try {
-        const resultAction = await dispatch(register(user,navigation));
-        
-        if (register.fulfilled.match(resultAction)) {
-            console.log("Registration successful:", resultAction.payload);
-            navigation.navigate("Đăng nhập");
-        } else {
-            // Display error feedback to the user
-            const errorMessage = resultAction.payload?.message || "Registration failed.";
-            console.error("Registration error:", errorMessage);
-            dispatch(setErrorsRegister({ message: errorMessage })); // Store errors in state if needed
-        }
-    } catch (error) {
-        console.error("Error dispatching register:", error);
-        const errorMessage = error.response?.data?.message || "An error occurred. Please try again.";
-        dispatch(setErrorsRegister({ message: errorMessage }));
-    }
-};
+      const resultAction = dispatch(register(user, navigation));
 
+      if (register.fulfilled.match(resultAction)) {
+        console.log("Registration successful:", resultAction.payload);
+        navigation.navigate("Đăng nhập");
+      } else {
+        // Display error feedback to the user
+        const errorMessage =
+          resultAction.payload?.message || "Registration failed.";
+        console.error("Registration error:", errorMessage);
+        dispatch(setErrorsRegister({ message: errorMessage })); // Store errors in state if needed
+      }
+    } catch (error) {
+      console.error("Error dispatching register:", error);
+      const errorMessage =
+        error.response?.data?.message || "An error occurred. Please try again.";
+      dispatch(setErrorsRegister({ message: errorMessage }));
+    }
+  };
 
   const handleInputChange = (name, value) => {
     setUser((prevUser) => ({
@@ -114,8 +115,37 @@ function Register() {
               value={user.userName}
               onChangeText={(text) => handleInputChange("userName", text)}
               returnKeyType="next"
-              onKeyPress={(event) => handleKeyDown(event, inputRefs.parentName)}
+              onKeyPress={(event) => handleKeyDown(event, inputRefs.password)}
             />
+          </View>
+
+          {/* Password Input */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Mật khẩu</Text>
+            <View style={styles.passwordContainer}>
+              <TextInput
+                ref={inputRefs.password}
+                style={styles.passwordInput}
+                placeholder="Nhập mật khẩu"
+                value={user.password}
+                onChangeText={(text) => handleInputChange("password", text)}
+                secureTextEntry={!showPassword}
+                returnKeyType="next"
+                onKeyPress={(event) =>
+                  handleKeyDown(event, inputRefs.parentName)
+                }
+              />
+              <TouchableOpacity
+                onPress={() => setShowPassword(!showPassword)}
+                style={styles.iconContainer}
+              >
+                <Icon
+                  name={showPassword ? "eye-off" : "eye"}
+                  size={20}
+                  color="#333"
+                />
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Full Name Input */}
@@ -125,8 +155,8 @@ function Register() {
               ref={inputRefs.parentName}
               style={styles.input}
               placeholder="Nhập họ và tên"
-              value={user.parentName} // Use user.parentName to bind the state
-              onChangeText={(text) => handleInputChange("parentName", text)} // Correct property here
+              value={user.parentName}
+              onChangeText={(text) => handleInputChange("parentName", text)}
               returnKeyType="next"
               onKeyPress={(event) => handleKeyDown(event, inputRefs.childName)}
             />
@@ -143,10 +173,48 @@ function Register() {
               onChangeText={(text) => handleInputChange("childName", text)}
               returnKeyType="next"
               onKeyPress={(event) =>
-                handleKeyDown(event, inputRefs.phoneNumber)
+                handleKeyDown(event, inputRefs.childBirthday)
               }
             />
           </View>
+
+          {/* Birth Date Input */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Ngày sinh của bé</Text>
+            <TextInput
+              ref={inputRefs.childBirthday}
+              style={styles.input}
+              placeholder="Nhập ngày sinh (YYYY-MM-DD)"
+              value={user.childBirthday}
+              onChangeText={(text) => handleInputChange("childBirthday", text)}
+              returnKeyType="next"
+              onKeyPress={(event) => handleKeyDown(event, inputRefs.gender)}
+            />
+          </View>
+
+          {/* Gender Picker */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Giới tính</Text>
+            <Picker
+              selectedValue={user.gender}
+              style={styles.picker}
+              onValueChange={(itemValue) =>
+                handleInputChange("gender", itemValue)
+              }
+            >
+              <Picker.Item label="Chọn giới tính" value="" />
+              <Picker.Item label="Nam" value="male" />
+              <Picker.Item label="Nữ" value="female" />
+              <Picker.Item label="Khác" value="other" />
+            </Picker>
+          </View>
+
+          {/* Display Age */}
+          {user.childBirthday && (
+            <Text style={styles.ageText}>
+              Độ tuổi của bé: {calculateAge(user.childBirthday)} tuổi
+            </Text>
+          )}
 
           {/* Phone Input */}
           <View style={styles.inputContainer}>
@@ -222,72 +290,9 @@ function Register() {
               placeholder="Nhập tên thiết bị"
               value={user.deviceName}
               onChangeText={(text) => handleInputChange("deviceName", text)}
-              returnKeyType="next"
-              onKeyPress={(event) =>
-                handleKeyDown(event, inputRefs.childBirthday)
-              }
-            />
-          </View>
-
-          {/* Birth Date Input */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Ngày sinh của bé</Text>
-            <TextInput
-              ref={inputRefs.childBirthday}
-              style={styles.input}
-              placeholder="Nhập ngày sinh (YYYY-MM-DD)"
-              value={user.childBirthday}
-              onChangeText={(text) => handleInputChange("childBirthday", text)}
               returnKeyType="done"
               onKeyPress={(event) => handleKeyDown(event)}
             />
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Giới tính</Text>
-            <Picker
-              selectedValue={user.gender}
-              style={styles.picker}
-              onValueChange={(itemValue) => handleInputChange("gender", itemValue)}
-            >
-              <Picker.Item label="Chọn giới tính" value="" />
-              <Picker.Item label="Nam" value="male" />
-              <Picker.Item label="Nữ" value="female" />
-              <Picker.Item label="Khác" value="other" />
-            </Picker>
-          </View>
-
-          {/* Display Age */}
-          {user.childBirthday && (
-            <Text style={styles.ageText}>
-              Độ tuổi của bé: {calculateAge(user.childBirthday)} tuổi
-            </Text>
-          )}
-
-          {/* Password Input */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Mật khẩu</Text>
-            <View style={styles.passwordContainer}>
-              <TextInput
-                ref={inputRefs.password}
-                style={styles.passwordInput}
-                placeholder="Nhập mật khẩu"
-                value={user.password}
-                onChangeText={(text) => handleInputChange("password", text)}
-                secureTextEntry={!showPassword}
-                returnKeyType="done"
-                onKeyPress={(event) => handleKeyDown(event)}
-              />
-              <TouchableOpacity
-                onPress={() => setShowPassword(!showPassword)}
-                style={styles.iconContainer}
-              >
-                <Icon
-                  name={showPassword ? "eye-off" : "eye"}
-                  size={20}
-                  color="#333"
-                />
-              </TouchableOpacity>
-            </View>
           </View>
 
           {/* Register Button */}

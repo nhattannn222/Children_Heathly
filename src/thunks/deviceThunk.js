@@ -3,31 +3,16 @@ import { API } from '../constants/api'
 import { loadTokenFromStorage } from '../services/AuthService'
 import { TOAST_ERROR, TOAST_SUCCESS } from '../constants/toast'
 import Toast from 'react-native-toast-message'
+import { setAllSensor } from '../slices/iotSlice'
 
-export const getSensorDevice = (id) => async (dispatch, rejectWithValue) => {
-  await axios
-    .get(`${API.uri}/sensors/${id}`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    .then((response) => {
-      if (response) {
-        dispatch(setSingleJob(response?.data?.result?.content))
-      }
-    })
-    .catch((error) => {
-      console.log(error)
-    })
-}
 
-export const connectDevice = (id, data) => async (
+export const connectDevice = (deviceId, data) => async (
   dispatch,
   rejectWithValue,
 ) => {
   try {
     await axios
-      .put(`${API.uri}/sensors/${id}`, data, {
+      .get(`${API.uri}/devices/status/${deviceId}`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -38,6 +23,8 @@ export const connectDevice = (id, data) => async (
             type: TOAST_SUCCESS,
             text1: 'Thành công',
           })
+          dispatch(setAllSensor(response.data))
+
         }
       })
       .catch((error) => {

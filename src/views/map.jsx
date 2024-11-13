@@ -36,8 +36,10 @@ const MapScreen = () => {
     }
   };
   const childLocation = {
-    latitude: latestData?.Latitude??11.10774965753401,
-    longitude: latestData?.Longitude??106.61418139708277,
+    latitude: latestData?.Latitude??10.989860142064497,
+    longitude: latestData?.Longitude??106.66402429523171
+    // latitude: latestData?.Latitude??11.10774965753401,
+    // longitude: latestData?.Longitude??106.61418139708277,
   };
 
   console.log("childLocation", childLocation)

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -19,60 +19,71 @@ import thermometer from "../../assets/thermometer.png";
 import Layout from "../layout/layout";
 import { getSensor } from "../thunks/sencorThunk";
 import { connectDevice } from "../thunks/deviceThunk";
+import axios from "axios";
+import { API } from "../constants/api"
+import { setAllSensor } from "../slices/iotSlice";
 
 const HomeScreen = () => {
   const allSensor = useSelector((state) => state.IoTReducer.allSensor);
   const user = useSelector((state) => state.authReducer.user);
   const dispatch = useDispatch();
   const latestData = useSelector((state) => state.IoTReducer.sensorData);
+  const [theodoi, setTheoDoi] = useState("");
   
   useEffect(() => {
     dispatch(getSensor(user?.deviceName));
 
     const interval = setInterval(() => {
       dispatch(getSensor(user?.deviceName));
-    }, 1000);
+    }, 10000);
 
     return () => clearInterval(interval);
   }, [dispatch, user?.deviceName]);
+
   
-
-  // const allSensorData = allSensor?.flatMap(
-  //   (sensor) => sensor.sensor_data || []
-  // );
-
-  // Get the data closest to the current time
-  // const latestData = allSensorData?.reduce((closest, current) => {
-  //   const currentTime = new Date(); // Current time
-  //   const currentTimestamp = new Date(current.timestamp); // Timestamp of the current data
-  //   const closestTimestamp = new Date(closest.timestamp); // Timestamp of the closest data
-
-  //   // Compare the time difference between current data and current time with the closest data
-  //   return Math.abs(currentTime - currentTimestamp) < Math.abs(currentTime - closestTimestamp)
-  //     ? current
-  //     : closest;
-  // }, allSensorData[0]);
-  
+  const fetchTheoDoi = async() => {
+    try {
+      const response = await axios.post(`${API.uri}/devices/infoData/${user?.deviceName}`,latestData)
+      
+      if(response){
+        setTheoDoi(response.data)
+      }
+    } catch (error) {
+      
+    }
+  }
   
   // Check conditions for status
   const ketQuaNhietDo = latestData?.ketQuaNhietDo?.includes("Sốt");
   const ketQuaSpO2 = latestData?.ketQuaSpO2?.includes("Nguy hiểm");
   const ketQuaNhipTim = latestData?.ketQuaNhipTim?.includes("Nguy hiểm");
 
-  // Check if any of the results indicate danger
-  const isDanger = [ketQuaNhietDo, ketQuaSpO2, ketQuaNhipTim].some(
-    (result) => result === true
-  );
+  if(ketQuaNhietDo || ketQuaSpO2 || ketQuaNhipTim){
+    fetchTheoDoi();
+  }
 
-  const handleSensorToggle = (sensor) => {
-    const newStatus = !sensor?.status;
-    dispatch(connectDevice(sensor.idsensor, { status: newStatus }));
+
+  // useEffect(() => {
+  //   dispatch(connectDevice(user?.deviceName));
+
+  //   const interval = setInterval(() => {
+  //     dispatch(connectDevice(user?.deviceName));
+  //     console.log(allSensor[0]);
+      
+  //   }, 10000);
+
+  //   return () => clearInterval(interval);
+  // }, [dispatch, user?.deviceName]);
+
+  const handleSensorToggle = () => {
+    dispatch(connectDevice(user?.deviceName));
+    
   };
 
   return (
     <Layout>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.deviceCard} key={allSensor[0]?.id}>
+        <View style={styles.deviceCard} key={allSensor[0]?.deviceId}>
           <Image source={connect} style={styles.deviceIcon} />
           <Text style={styles.deviceStatusText}>
             {allSensor[0]?.status ? "Đã kết nối thiết bị" : "Thiết bị chưa kết nối"}
@@ -91,20 +102,16 @@ const HomeScreen = () => {
             <Text style={styles.valueText}>
               Độ tuổi: {latestData ? `${latestData?.age} tuổi` : "---"}
             </Text>
-  
             <Text style={styles.valueText}>
             Giới tính: {latestData ? `${latestData?.gender=="male"?"Nam":"Nữ"} ` : "---"}
             </Text>
             <Text style={styles.valueText}>
-            Chiều cao: {latestData ? `${latestData?.height} m ` : "---"}
+            Chiều cao: {latestData ? `${latestData?.height} cm ` : "---"}
             </Text>
             <Text style={styles.valueText}>
            Cân nặng: {latestData ? `${latestData?.weight} kg` : "---"}
             </Text>
           </View>
-
-          
-
           {/* Temperature */}
           <View style={[styles.infoCard, { backgroundColor: ketQuaNhietDo ? "#f74d58" : 'white' }]}>
             <Image source={thermometer} style={styles.icon} />
@@ -142,7 +149,6 @@ const HomeScreen = () => {
                 : latestData?.prediction === "warning" 
                 ? "#FFC107" 
                 : "white",
-              height: 100,
               width: '100%',
               borderRadius: 15,
               justifyContent: 'center',
@@ -172,6 +178,14 @@ const HomeScreen = () => {
               ketQuaNhipTim && latestData.ketQuaNhipTim
             }
           </Text>
+          <Text style={styles.valueText}>
+          {theodoi.split("|").map((item, index) => (
+            <React.Fragment key={index}>
+              {item}
+              {"\n"}
+            </React.Fragment>
+          ))}
+        </Text>
         </View>
         </View>
       </ScrollView>
