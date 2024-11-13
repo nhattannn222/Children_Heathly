@@ -19,12 +19,14 @@ export const connectDevice = (deviceId, data) => async (
       })
       .then((response) => {
         if (response) {
-          Toast.show({
-            type: TOAST_SUCCESS,
-            text1: 'Thành công',
-          })
-          dispatch(setAllSensor(response.data))
-
+          
+          if(response.data[0].status){
+            Toast.show({
+              type: TOAST_SUCCESS,
+              text1: 'Thành công',
+            })
+            dispatch(setAllSensor(response.data))
+          }
         }
       })
       .catch((error) => {

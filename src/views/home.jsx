@@ -19,7 +19,7 @@ import thermometer from "../../assets/thermometer.png";
 import Layout from "../layout/layout";
 import { getSensor } from "../thunks/sencorThunk";
 import { connectDevice } from "../thunks/deviceThunk";
-import axios from "axios";
+import axios, { all } from "axios";
 import { API } from "../constants/api"
 import { setAllSensor } from "../slices/iotSlice";
 
@@ -35,6 +35,9 @@ const HomeScreen = () => {
 
     const interval = setInterval(() => {
       dispatch(getSensor(user?.deviceName));
+      if(!allSensor[0].status){
+        dispatch(connectDevice(user?.deviceName));
+      }
     }, 10000);
 
     return () => clearInterval(interval);

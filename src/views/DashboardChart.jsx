@@ -17,7 +17,17 @@ const DashboardChart = () => {
   // Hàm gọi API để lấy dữ liệu
   const fetchData = async () => {
     try {
-      const response = await axios.get(`${API.uri}/devices/chart/${user?.deviceName}`); // Thay bằng URL API thật
+
+      let obj = {
+        endTs: new Date().toISOString() // Lấy thời gian hiện tại dưới dạng UTC ISO 8601
+      };
+      
+      // Tạo startTs là endTs trừ đi 1 phút
+      let endDate = new Date(); // Thời gian hiện tại
+      let startDate = new Date(endDate.getTime() - 1 * 6000 * 1000); // Trừ đi 1 phút (60 giây * 1000 ms)
+      
+      obj.startTs = startDate.toISOString(); // Thêm startTs vào obj
+      const response = await axios.post(`${API.uri}/devices/chart/${user?.deviceName}`,obj); // Thay bằng URL API thật
       const newData = response.data;
       
       // Giả sử API trả về một object có mảng dữ liệu

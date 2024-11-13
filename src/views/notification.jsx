@@ -27,7 +27,17 @@ const NotificationScreen = () => {
   // Function to fetch notifications from the API
   const fetchNotifications = async () => {
     try {
-      const response = await axios.get(`${API.uri}/devices/notify/${user?.deviceName}`); // Replace with your actual API endpoint
+      let obj = {
+        endTs: new Date().toISOString() // Lấy thời gian hiện tại dưới dạng UTC ISO 8601
+      };
+      
+      // Tạo startTs là endTs trừ đi 1 phút
+      let endDate = new Date(); // Thời gian hiện tại
+      let startDate = new Date(endDate.getTime() - 1 * 6000 * 1000); // Trừ đi 1 phút (60 giây * 1000 ms)
+      
+      obj.startTs = startDate.toISOString(); // Thêm startTs vào obj
+
+      const response = await axios.post(`${API.uri}/devices/notify/${user?.deviceName}`,obj); // Replace with your actual API endpoint
       setNotifications(response.data); // Assuming the API response is an array of notifications
     } catch (error) {
       console.error('Error fetching notifications:', error);
